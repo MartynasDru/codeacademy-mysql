@@ -39,4 +39,20 @@ router.get('/assignments/done', (req, res) => {
     });
 });
 
+router.post('/assignments', (req, res) => {
+    const { body } = req;
+
+    codeacademyConnection.execute(
+        'INSERT INTO assignments (name, done) VALUES (?, ?)',
+        [body.name, body.done],
+        (err, result) => {
+            if (err) {
+                res.json(err)
+            } else {
+                res.json(result);
+            }
+        }
+    )
+});
+
 module.exports = router;

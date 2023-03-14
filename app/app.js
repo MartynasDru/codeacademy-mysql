@@ -8,6 +8,7 @@ const assignmentsRouter = require('./router/assignments');
 const app = express();
 
 app.use(cors());
+app.use(express.json());
 app.use(tasksRouter);
 app.use(assignmentsRouter);
 
