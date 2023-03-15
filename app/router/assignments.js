@@ -1,5 +1,6 @@
 const express = require('express');
 const { codeacademyConnection } = require('../db');
+const { defaultCallback } = require('../utils/dbUtils');
 
 const router = express.Router();
 
@@ -10,33 +11,21 @@ router.get('/assignments', (req, res) => {
         codeacademyConnection.execute(
             'SELECT * FROM assignments WHERE done=?',
             [done],
-            (err, result) => {
-                if (err) {
-                    res.json(err);
-                } else {
-                    res.json(result);
-                }
-            }
+            (err, result) => defaultCallback(err, result, res)
         )
     } else {
-        codeacademyConnection.execute('SELECT * FROM assignments', (err, result) => {
-            if (err) {
-                res.json(err);
-            } else {
-                res.json(result);
-            }
-        });
+        codeacademyConnection.execute(
+            'SELECT * FROM assignments', 
+            (err, result) => defaultCallback(err, result, res)
+        );
     }
 });
 
 router.get('/assignments/done', (req, res) => {
-    codeacademyConnection.execute('SELECT * FROM assignments WHERE done=1', (err, result) => {
-        if (err) {
-            res.json(err);
-        } else {
-            res.json(result);
-        }
-    });
+    codeacademyConnection.execute(
+        'SELECT * FROM assignments WHERE done=1', 
+        (err, result) => defaultCallback(err, result, res)
+    );
 });
 
 router.post('/assignments', (req, res) => {
@@ -45,13 +34,7 @@ router.post('/assignments', (req, res) => {
     codeacademyConnection.execute(
         'INSERT INTO assignments (name, done) VALUES (?, ?)',
         [body.name, body.done],
-        (err, result) => {
-            if (err) {
-                res.json(err)
-            } else {
-                res.json(result);
-            }
-        }
+        (err, result) => defaultCallback(err, result, res)
     )
 });
 
@@ -78,13 +61,7 @@ router.patch('/assignments/:id', (req, res) => {
     codeacademyConnection.execute(
         sqlQuery,
         valuesArray,
-        (err, result) => {
-            if (err) {
-                res.json(err)
-            } else {
-                res.json(result);
-            }
-        }
+        (err, result) => defaultCallback(err, result, res)
     )
 });
 
@@ -94,13 +71,7 @@ router.delete('/assignments/:id', (req, res) => {
     codeacademyConnection.execute(
         'DELETE FROM assignments WHERE id=?',
         [id],
-        (err, result) => {
-            if (err) {
-                res.json(err)
-            } else {
-                res.json(result);
-            }
-        }
+        (err, result) => defaultCallback(err, result, res)
     )
 });
 
