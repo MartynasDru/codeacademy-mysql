@@ -5,20 +5,35 @@ const { defaultCallback } = require('../utils/dbUtils');
 const router = express.Router();
 
 router.get('/assignments', (req, res) => {
-    const { done } = req.query;
+    codeacademyConnection.execute(
+        `
+        SELECT 
+            assignments.id,
+            assignments.name,
+            employees.name as employee_name,
+            employees.phone_number
+        FROM
+            assignments
+                INNER JOIN
+            employees ON employees.id=assignments.employee_id;
+        `,
+        (err, result) => defaultCallback(err, result, res)
+    );
 
-    if (done === '0' || done === '1') {
-        codeacademyConnection.execute(
-            'SELECT * FROM assignments WHERE done=?',
-            [done],
-            (err, result) => defaultCallback(err, result, res)
-        )
-    } else {
-        codeacademyConnection.execute(
-            'SELECT * FROM assignments', 
-            (err, result) => defaultCallback(err, result, res)
-        );
-    }
+    // const { done } = req.query;
+
+    // if (done === '0' || done === '1') {
+    //     codeacademyConnection.execute(
+    //         'SELECT * FROM assignments WHERE done=?',
+    //         [done],
+    //         (err, result) => defaultCallback(err, result, res)
+    //     )
+    // } else {
+    //     codeacademyConnection.execute(
+    //         'SELECT * FROM assignments', 
+    //         (err, result) => defaultCallback(err, result, res)
+    //     );
+    // }
 });
 
 router.get('/assignments/done', (req, res) => {
