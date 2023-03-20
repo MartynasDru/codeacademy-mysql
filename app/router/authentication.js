@@ -1,5 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
 const { tasksManagerConnection } = require('../db');
 const { defaultCallback } = require('../utils/dbUtils');
 
@@ -41,9 +43,13 @@ router.post('/login', (req, res) => {
                 const user = result[0];
                 const isPasswordCorrect = bcrypt.compareSync(password, user.password);
 
+                const { id, email } = user;
+
                 if (isPasswordCorrect) {
+                    const token = jwt.sign({ id, email }, 'TEST');
                     res.json({
-                        message: 'Successfully logged in!'
+                        message: 'Successfully logged in!',
+                        token
                     });
                 } else {
                     incorrectCredentialsResponse();
