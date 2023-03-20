@@ -46,7 +46,7 @@ router.post('/login', (req, res) => {
                 const { id, email } = user;
 
                 if (isPasswordCorrect) {
-                    const token = jwt.sign({ id, email }, 'TEST');
+                    const token = jwt.sign({ id, email }, process.env.JWT_SECRET);
                     res.json({
                         message: 'Successfully logged in!',
                         token
