@@ -1,40 +1,56 @@
 const express = require('express');
 const { codeacademyConnection } = require('../db');
 const { defaultCallback } = require('../utils/dbUtils');
+const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 
-router.get('/assignments', (req, res) => {
-    codeacademyConnection.execute(
-        `
-        SELECT 
-            assignments.id,
-            assignments.name,
-            employees.name as employee_name,
-            employees.phone_number
-        FROM
-            assignments
-                INNER JOIN
-            employees ON employees.id=assignments.employee_id;
-        `,
-        (err, result) => defaultCallback(err, result, res)
-    );
+router.get(
+    '/assignments',
+    (req, res, next) => {
+        try {
+            const token = req.headers.authorization.split(' ')[1];
+            const user = jwt.verify(token, process.env.JWT_SECRET);
+            console.log(user);
+            next();
+        } catch (e) {
+            res.json({
+                message: 'Invalid token'
+            })
+        }
+    },
+    (req, res) => {
+        codeacademyConnection.execute(
+            `
+            SELECT 
+                assignments.id,
+                assignments.name,
+                employees.name as employee_name,
+                employees.phone_number
+            FROM
+                assignments
+                    INNER JOIN
+                employees ON employees.id=assignments.employee_id;
+            `,
+            (err, result) => defaultCallback(err, result, res)
+        );
 
-    // const { done } = req.query;
+        // const { done } = req.query;
 
-    // if (done === '0' || done === '1') {
-    //     codeacademyConnection.execute(
-    //         'SELECT * FROM assignments WHERE done=?',
-    //         [done],
-    //         (err, result) => defaultCallback(err, result, res)
-    //     )
-    // } else {
-    //     codeacademyConnection.execute(
-    //         'SELECT * FROM assignments', 
-    //         (err, result) => defaultCallback(err, result, res)
-    //     );
-    // }
-});
+        // if (done === '0' || done === '1') {
+        //     codeacademyConnection.execute(
+        //         'SELECT * FROM assignments WHERE done=?',
+        //         [done],
+        //         (err, result) => defaultCallback(err, result, res)
+        //     )
+        // } else {
+        //     codeacademyConnection.execute(
+        //         'SELECT * FROM assignments', 
+        //         (err, result) => defaultCallback(err, result, res)
+        //     );
+        // }
+    }
+);
 
 router.get('/assignments/done', (req, res) => {
     codeacademyConnection.execute(
