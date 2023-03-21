@@ -1,24 +1,13 @@
 const express = require('express');
 const { codeacademyConnection } = require('../db');
 const { defaultCallback } = require('../utils/dbUtils');
-const jwt = require('jsonwebtoken');
+const { verifyToken } = require('../utils/authenticationUtils');
 
 const router = express.Router();
 
 router.get(
     '/assignments',
-    (req, res, next) => {
-        try {
-            const token = req.headers.authorization.split(' ')[1];
-            const user = jwt.verify(token, process.env.JWT_SECRET);
-            console.log(user);
-            next();
-        } catch (e) {
-            res.json({
-                message: 'Invalid token'
-            })
-        }
-    },
+    verifyToken,
     (req, res) => {
         codeacademyConnection.execute(
             `
@@ -32,7 +21,9 @@ router.get(
                     INNER JOIN
                 employees ON employees.id=assignments.employee_id;
             `,
-            (err, result) => defaultCallback(err, result, res)
+            (err, result) => {
+                defaultCallback(err, result, res);
+            }
         );
 
         // const { done } = req.query;
@@ -52,14 +43,14 @@ router.get(
     }
 );
 
-router.get('/assignments/done', (req, res) => {
+router.get('/assignments/done', verifyToken, (req, res) => {
     codeacademyConnection.execute(
         'SELECT * FROM assignments WHERE done=1', 
         (err, result) => defaultCallback(err, result, res)
     );
 });
 
-router.post('/assignments', (req, res) => {
+router.post('/assignments', verifyToken, (req, res) => {
     const { body } = req;
 
     codeacademyConnection.execute(
@@ -69,7 +60,7 @@ router.post('/assignments', (req, res) => {
     )
 });
 
-router.patch('/assignments/:id', (req, res) => {
+router.patch('/assignments/:id', verifyToken, (req, res) => {
     const { body } = req;
     const { id } = req.params;
 
@@ -96,7 +87,7 @@ router.patch('/assignments/:id', (req, res) => {
     )
 });
 
-router.delete('/assignments/:id', (req, res) => {
+router.delete('/assignments/:id', verifyToken, (req, res) => {
     const { id } = req.params;
 
     codeacademyConnection.execute(
