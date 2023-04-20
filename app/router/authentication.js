@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 
 const { tasksManagerConnection } = require('../db');
 const { defaultCallback } = require('../utils/dbUtils');
+const { verifyToken } = require('../utils/authenticationUtils');
 
 const router = express.Router();
 
@@ -59,6 +60,10 @@ router.post('/login', (req, res) => {
             }
         }
     )
+});
+
+router.get('/token/verify', verifyToken, (req, res) => {
+    res.json(res.locals.user);
 });
 
 module.exports = router;
