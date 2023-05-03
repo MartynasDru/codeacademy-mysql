@@ -41,7 +41,6 @@ router.post("/products", (req, res) => {
     description,
     price,
     discountPercentage,
-    rating,
     stock,
     brand,
     category,
@@ -49,15 +48,14 @@ router.post("/products", (req, res) => {
   } = req.body;
 
   tasksManagerConnection.execute(
-    `INSERT INTO products (title, description, price, discountPercentage, rating, stock, brand, category, thumbnail)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `INSERT INTO products (title, description, price, discountPercentage, stock, brand, category, thumbnail)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `,
     [
       title,
       description,
       price,
       discountPercentage,
-      rating,
       stock,
       brand,
       category,
